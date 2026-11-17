@@ -68,3 +68,97 @@ Phishing Guard is an educational project that uses predefined rules to analyze U
 Project Name: Phishing Guard
 
 Repository: "GitHub - Phishing Guard" (https://github.com/Rafi-174/Phishing-Guard)
+
+🚀 Installation & Setup Guide
+
+Follow these steps to run Phishing Guard on your local computer.
+
+1. Clone the Repository
+
+git clone https://github.com/Rafi-174/Phishing-Guard.git
+cd Phishing-Guard
+
+2. Set Up Python Environment
+
+cd Backend
+python -m venv .venv
+
+Activate the virtual environment:
+
+Windows PowerShell:
+
+..\ .venv\Scripts\Activate.ps1
+
+If the environment is created inside the Backend folder, use:
+
+.venv\Scripts\Activate.ps1
+
+3. Install Dependencies
+
+pip install -r requirements.txt
+
+4. Configure MySQL Database
+
+Make sure MySQL is installed and running.
+
+Create the database:
+
+CREATE DATABASE phishguard_db;
+USE phishguard_db;
+
+Create the scans table:
+
+CREATE TABLE scans (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    url TEXT NOT NULL,
+    risk_score INT NOT NULL,
+    risk_level VARCHAR(50) NOT NULL,
+    indicators JSON,
+    scanned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+5. Configure Environment Variables
+
+Create a ".env" file inside the Backend folder.
+
+Add your database configuration:
+
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_mysql_password
+DB_NAME=phishguard_db
+DB_PORT=3306
+
+FRONTEND_ORIGINS=http://127.0.0.1:5500,http://localhost:5500
+FLASK_DEBUG=false
+
+Replace "your_mysql_password" with your own MySQL password.
+
+Important: Never upload your ".env" file or database password to GitHub.
+
+6. Test Database Connection
+
+python test_db.py
+
+A successful connection should display:
+
+MySQL Connection Successful!
+
+7. Run the Backend
+
+python app.py
+
+The Flask backend will run at:
+
+"http://127.0.0.1:5000"
+
+8. Run the Frontend
+
+- Open the Frontend folder in VS Code.
+- Open "index.html".
+- Run it using the Live Server extension.
+- Use the local address "http://127.0.0.1:5500".
+
+🎉 You're Ready!
+
+Phishing Guard is now ready to analyze URLs on your local computer.
