@@ -1,14 +1,21 @@
+import json
 import mysql.connector
+
 from config import DB_CONFIG
 
+
+# DATABASE CONNECTION
 
 def get_connection():
     return mysql.connector.connect(**DB_CONFIG)
 
 
+# SAVE URL SCAN
+
 def save_scan(url, risk_score, risk_level, indicators):
 
     connection = get_connection()
+    cursor = None
 
     try:
         cursor = connection.cursor()
@@ -18,8 +25,6 @@ def save_scan(url, risk_score, risk_level, indicators):
             (url, risk_score, risk_level, indicators)
             VALUES (%s, %s, %s, %s)
         """
-
-        import json
 
         values = (
             url,
@@ -31,18 +36,21 @@ def save_scan(url, risk_score, risk_level, indicators):
         cursor.execute(sql, values)
         connection.commit()
 
-        scan_id = cursor.lastrowid
-
-        return scan_id
+        return cursor.lastrowid
 
     finally:
-        cursor.close()
+        if cursor is not None:
+            cursor.close()
+
         connection.close()
 
+
+# GET ALL SCANS
 
 def get_all_scans(limit=100):
 
     connection = get_connection()
+    cursor = None
 
     try:
         cursor = connection.cursor(dictionary=True)
@@ -65,9 +73,11 @@ def get_all_scans(limit=100):
         results = cursor.fetchall()
 
         for item in results:
+
             if isinstance(item["indicators"], str):
-                import json
-                item["indicators"] = json.loads(item["indicators"])
+                item["indicators"] = json.loads(
+                    item["indicators"]
+                )
 
             if item["scanned_at"]:
                 item["scanned_at"] = item["scanned_at"].isoformat(
@@ -78,13 +88,18 @@ def get_all_scans(limit=100):
         return results
 
     finally:
-        cursor.close()
+        if cursor is not None:
+            cursor.close()
+
         connection.close()
 
+
+# DASHBOARD STATISTICS
 
 def get_scan_statistics():
 
     connection = get_connection()
+    cursor = None
 
     try:
         cursor = connection.cursor(dictionary=True)
@@ -121,13 +136,18 @@ def get_scan_statistics():
         }
 
     finally:
-        cursor.close()
+        if cursor is not None:
+            cursor.close()
+
         connection.close()
 
+
+# DELETE ALL SCAN HISTORY
 
 def delete_all_scans():
 
     connection = get_connection()
+    cursor = None
 
     try:
         cursor = connection.cursor()
@@ -137,5 +157,7 @@ def delete_all_scans():
         connection.commit()
 
     finally:
-        cursor.close()
+        if cursor is not None:
+            cursor.close()
+
         connection.close()

@@ -1,4 +1,4 @@
-const API_BASE = "http://127.0.0.1:5000/api";
+const API_BASE = "https://YOUR-BACKEND-NAME.onrender.com/api";
 
 const scanForm = document.getElementById("scanForm");
 const urlInput = document.getElementById("urlInput");
