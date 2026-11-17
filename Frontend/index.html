@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhishGuard | URL Security</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+
+    <button class="menu-toggle" id="menuToggle" title="Toggle menu">
+      <span class="menu-icon">☰</span>
+    </button>
+
+    <div class="brand">
+      <div class="brand-icon">P</div>
+      <span class="brand-name">PhishGuard</span>
+    </div>
+
+    <nav class="navigation">
+
+      <button class="nav-item active" data-page="dashboard" title="Dashboard">
+        <span class="nav-icon">⌂</span>
+        <span class="nav-label">Dashboard</span>
+      </button>
+
+      <button class="nav-item" data-page="history" title="Scan History">
+        <span class="nav-icon">◷</span>
+        <span class="nav-label">Scan History</span>
+      </button>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-status">
+        <span class="status-dot"></span>
+        <span class="nav-label">Protection workspace</span>
+      </div>
+    </div>
+
+  </aside>
+
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- DASHBOARD PAGE -->
+    <section class="page active" id="dashboardPage">
+
+      <!-- WELCOME NOTE -->
+      <div class="welcome-note">
+        <div>
+          <p class="welcome-small">YOUR SECURITY SPACE</p>
+          <h2>Welcome! <span>Stay safe online.</span></h2>
+        </div>
+      </div>
+
+
+      <!-- URL SCANNER -->
+      <section class="hero">
+
+        <div class="hero-tag">
+          <span class="tag-dot"></span>
+          SMART LINK CHECKER
+        </div>
+
+        <h1>Analyze before <span>you click.</span></h1>
+
+        <p class="hero-description">
+          Identify suspicious links and understand potential security risks
+          with a simple URL analysis.
+        </p>
+
+
+        <div class="scanner-card">
+
+          <form id="scanForm">
+
+            <label for="urlInput">Link</label>
+
+            <div class="input-wrapper">
+
+              <span class="input-icon">↗</span>
+
+              <input
+                type="text"
+                id="urlInput"
+                placeholder="Paste your link here..."
+                autocomplete="off"
+                required
+              >
+
+              <button type="submit" class="analyze-button" id="analyzeButton">
+                Analyze Link <span>→</span>
+              </button>
+
+            </div>
+
+          </form>
+
+
+          <div class="demo-links">
+
+            <span>Try an example:</span>
+
+            <button
+              type="button"
+              class="demo-link"
+              data-url="http://192.168.1.50/login">
+              IP Address
+            </button>
+
+            <button
+              type="button"
+              class="demo-link"
+              data-url="http://verify-account.example.com">
+              Suspicious Link
+            </button>
+
+            <button
+              type="button"
+              class="demo-link"
+              data-url="https://www.example.com">
+              Safe Example
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ANALYSIS RESULT -->
+      <section class="result-card hidden" id="resultCard">
+
+        <div class="result-header">
+
+          <div>
+            <p class="section-kicker">ANALYSIS RESULT</p>
+            <h2>Link assessment</h2>
+          </div>
+
+          <span class="risk-badge" id="riskBadge">Low Risk</span>
+
+        </div>
+
+
+        <div class="result-content">
+
+          <div class="score-circle" id="scoreCircle">
+
+            <div>
+              <strong id="riskScore">0</strong>
+              <span>/ 100</span>
+            </div>
+
+            <small>Risk Score</small>
+
+          </div>
+
+
+          <div class="result-details">
+
+            <p class="result-label">Analyzed link</p>
+
+            <p class="result-url" id="resultUrl"></p>
+
+            <h3 id="resultTitle">No major warning signs found</h3>
+
+            <p id="resultMessage"></p>
+
+            <div class="indicator-list" id="indicatorList"></div>
+
+          </div>
+
+        </div>
+
+
+        <p class="disclaimer">
+          Note: This score is based on predefined rules and does not guarantee that a link is safe.
+        </p>
+
+      </section>
+
+
+      <!-- SCAN OVERVIEW -->
+      <section class="overview-section">
+
+        <div class="section-heading">
+
+          <div>
+            <p class="section-kicker">YOUR ACTIVITY</p>
+            <h2>Scan Overview</h2>
+          </div>
+
+        </div>
+
+
+        <div class="stats-grid">
+
+          <div class="stat-card">
+            <div class="stat-icon red-icon">↗</div>
+            <p>Total Scans</p>
+            <h3 id="totalScans">0</h3>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon dark-icon">!</div>
+            <p>High Risk</p>
+            <h3 id="highRisk">0</h3>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon orange-icon">⚠</div>
+            <p>Suspicious</p>
+            <h3 id="suspiciousCount">0</h3>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon green-icon">✓</div>
+            <p>Low Risk</p>
+            <h3 id="lowRisk">0</h3>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- PREVIOUSLY SCANNED -->
+      <section class="recent-section">
+
+        <div class="section-heading">
+
+          <div>
+            <p class="section-kicker">ACTIVITY LOG</p>
+            <h2>Previously Scanned</h2>
+          </div>
+
+          <button class="history-button" id="viewHistoryButton">
+            View History <span>→</span>
+          </button>
+
+        </div>
+
+
+        <div class="table-card">
+
+          <div class="table-scroll">
+
+            <table>
+
+              <thead>
+                <tr>
+                  <th>URL</th>
+                  <th>Risk Level</th>
+                  <th>Score</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+
+              <tbody id="recentTableBody">
+                <tr>
+                  <td colspan="4" class="empty-state">
+                    No scans yet. Analyze your first link!
+                  </td>
+                </tr>
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </section>
+
+
+    <!-- HISTORY PAGE -->
+    <section class="page" id="historyPage">
+
+      <div class="history-heading">
+
+        <div>
+          <p class="section-kicker">YOUR ACTIVITY</p>
+          <h1>Scan History</h1>
+          <p>Review your previously analyzed links and their risk levels.</p>
+        </div>
+
+        <button class="clear-button" id="clearHistoryButton">
+          Clear History
+        </button>
+
+      </div>
+
+
+      <div class="table-card history-table-card">
+
+        <div class="table-scroll">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>URL</th>
+                <th>Risk Level</th>
+                <th>Score</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+
+            <tbody id="historyTableBody">
+              <tr>
+                <td colspan="4" class="empty-state">
+                  No scan history available.
+                </td>
+              </tr>
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+
+      <button class="back-button" id="backDashboardButton">
+        ← Back to Dashboard
+      </button>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <span>PhishGuard</span>
+      <span>Link awareness. Safer browsing.</span>
+    </footer>
+
+  </main>
+
+
+  <!-- TOAST MESSAGE -->
+  <div class="toast" id="toast"></div>
+
+
+  <script src="script.js"></script>
+
+</body>
+</html>
