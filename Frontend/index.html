@@ -14,8 +14,274 @@
 
 <body>
 
+  <!-- AUTHENTICATION SCREEN -->
+
+  <section class="auth-screen" id="authScreen">
+    <canvas id="securityCanvas"></canvas>
+
+    <div class="auth-card">
+
+      <div class="auth-brand">
+        <div class="brand-icon">P</div>
+        <span>PhishGuard</span>
+      </div>
+
+      <p class="section-kicker">ACCOUNT SECURITY</p>
+
+      <h1 id="authTitle">Welcome Back</h1>
+
+      <p class="auth-description" id="authDescription">
+        Login to access your personal security dashboard.
+      </p>
+
+      <!-- LOGIN FORM -->
+
+      <form id="loginForm">
+
+        <label for="loginEmail">Username or Email</label>
+
+        <input
+          type="text"
+          id="loginEmail"
+          placeholder="Enter username or email"
+          autocomplete="username"
+          required
+        >
+
+        <label for="loginPassword">Password</label>
+
+        <div class="password-wrapper">
+          <input
+            type="password"
+            id="loginPassword"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            required
+          >
+          <button
+            type="button"
+            class="password-toggle"
+            data-password-target="loginPassword"
+            aria-label="Show password"
+          >Show</button>
+        </div>
+
+        <div class="forgot-password-row">
+          <button type="button" id="forgotPasswordLink">
+            Forgot Password?
+          </button>
+        </div>
+
+        <button type="submit" class="auth-submit" id="loginButton">
+          Login
+        </button>
+
+      </form>
+
+      <!-- REGISTRATION FORM -->
+
+      <form id="registerForm" class="hidden">
+
+        <label for="registerName">Full Name</label>
+
+        <input
+          type="text"
+          id="registerName"
+          placeholder="Enter your full name"
+          autocomplete="name"
+          maxlength="100"
+          required
+        >
+
+        <label for="registerUsername">Username</label>
+
+        <input
+          type="text"
+          id="registerUsername"
+          placeholder="Choose a username"
+          autocomplete="username"
+          minlength="3"
+          maxlength="30"
+          pattern="[A-Za-z0-9_]{3,30}"
+          title="Use 3-30 letters, numbers or underscores."
+          required
+        >
+
+        <label for="registerEmail">Email Address</label>
+
+        <input
+          type="email"
+          id="registerEmail"
+          placeholder="Enter your email"
+          autocomplete="email"
+          required
+        >
+
+        <label for="registerPassword">Password</label>
+
+        <div class="password-wrapper">
+          <input
+            type="password"
+            id="registerPassword"
+            placeholder="Create a password"
+            autocomplete="new-password"
+            minlength="8"
+            maxlength="128"
+            required
+          >
+          <button
+            type="button"
+            class="password-toggle"
+            data-password-target="registerPassword"
+            aria-label="Show password"
+          >Show</button>
+        </div>
+
+        <button type="submit" class="auth-submit" id="registerButton">
+          Create Account
+        </button>
+
+      </form>
+
+      <!-- FORGOT PASSWORD FORM -->
+
+      <form id="forgotPasswordForm" class="hidden">
+
+        <label for="forgotEmail">Registered Email Address</label>
+
+        <input
+          type="email"
+          id="forgotEmail"
+          placeholder="Enter your registered email"
+          autocomplete="email"
+          required
+        >
+
+        <button type="submit" class="auth-submit" id="forgotButton">
+          Send OTP
+        </button>
+
+        <button type="button" class="auth-back-button" id="backToLoginFromForgot">
+          ← Back to Login
+        </button>
+
+      </form>
+
+      <!-- OTP VERIFICATION FORM -->
+
+      <form id="verifyOtpForm" class="hidden">
+
+        <label for="otpEmail">Email Address</label>
+
+        <input
+          type="email"
+          id="otpEmail"
+          placeholder="Enter your email"
+          autocomplete="email"
+          required
+        >
+
+        <label for="resetOtp">6-Digit OTP</label>
+
+        <input
+          type="text"
+          id="resetOtp"
+          placeholder="Enter the OTP"
+          inputmode="numeric"
+          pattern="[0-9]{6}"
+          maxlength="6"
+          autocomplete="one-time-code"
+          required
+        >
+
+        <button type="submit" class="auth-submit" id="verifyOtpButton">
+          Verify OTP
+        </button>
+
+        <button type="button" class="auth-back-button" id="backToForgot">
+          ← Back
+        </button>
+
+      </form>
+
+      <!-- RESET PASSWORD FORM -->
+
+      <form id="resetPasswordForm" class="hidden">
+
+        <label for="newPassword">New Password</label>
+
+        <div class="password-wrapper">
+          <input
+            type="password"
+            id="newPassword"
+            placeholder="Enter new password"
+            autocomplete="new-password"
+            minlength="8"
+            maxlength="128"
+            required
+          >
+
+          <button
+            type="button"
+            class="password-toggle"
+            data-password-target="newPassword"
+            aria-label="Show password"
+          >Show</button>
+        </div>
+
+        <label for="confirmNewPassword">Confirm New Password</label>
+
+        <div class="password-wrapper">
+          <input
+            type="password"
+            id="confirmNewPassword"
+            placeholder="Confirm new password"
+            autocomplete="new-password"
+            minlength="8"
+            maxlength="128"
+            required
+          >
+
+          <button
+            type="button"
+            class="password-toggle"
+            data-password-target="confirmNewPassword"
+            aria-label="Show password"
+          >Show</button>
+        </div>
+
+        <button type="submit" class="auth-submit" id="resetPasswordButton">
+          Reset Password
+        </button>
+
+      </form>
+
+      <!-- AUTH SWITCH -->
+
+      <p class="auth-switch" id="authSwitch">
+        Don't have an account?
+        <button type="button" id="showRegister">
+          Register
+        </button>
+      </p>
+
+      <p class="auth-switch hidden" id="loginSwitch">
+        Already have an account?
+        <button type="button" id="showLogin">
+          Login
+        </button>
+      </p>
+
+      <p class="auth-message" id="authMessage"></p>
+
+    </div>
+
+  </section>
+
+
   <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
+
+  <aside class="sidebar hidden" id="sidebar">
 
     <button class="menu-toggle" id="menuToggle" title="Toggle menu">
       <span class="menu-icon">☰</span>
@@ -41,31 +307,49 @@
     </nav>
 
     <div class="sidebar-bottom">
+
       <div class="sidebar-status">
         <span class="status-dot"></span>
         <span class="nav-label">Protection workspace</span>
       </div>
+
+      <div class="account-info">
+        <span id="loggedInUser">User</span>
+
+        <button type="button" id="logoutButton">
+          Logout
+        </button>
+      </div>
+
     </div>
 
   </aside>
 
 
   <!-- MAIN CONTENT -->
-  <main class="main-content">
+
+  <main class="main-content hidden" id="mainContent">
 
     <!-- DASHBOARD PAGE -->
+
     <section class="page active" id="dashboardPage">
 
-      <!-- WELCOME NOTE -->
       <div class="welcome-note">
+
         <div>
           <p class="welcome-small">YOUR SECURITY SPACE</p>
-          <h2>Welcome! <span>Stay safe online.</span></h2>
+
+          <h2>
+            Welcome!
+            <span>Stay safe online.</span>
+          </h2>
         </div>
+
       </div>
 
 
       <!-- URL SCANNER -->
+
       <section class="hero">
 
         <div class="hero-tag">
@@ -73,13 +357,14 @@
           SMART LINK CHECKER
         </div>
 
-        <h1>Analyze before <span>you click.</span></h1>
+        <h1>
+          Analyze before <span>you click.</span>
+        </h1>
 
         <p class="hero-description">
           Identify suspicious links and understand potential security risks
           with a simple URL analysis.
         </p>
-
 
         <div class="scanner-card">
 
@@ -99,7 +384,11 @@
                 required
               >
 
-              <button type="submit" class="analyze-button" id="analyzeButton">
+              <button
+                type="submit"
+                class="analyze-button"
+                id="analyzeButton"
+              >
                 Analyze Link <span>→</span>
               </button>
 
@@ -107,6 +396,7 @@
 
           </form>
 
+          <!-- DEMO LINKS -->
 
           <div class="demo-links">
 
@@ -141,6 +431,7 @@
 
 
       <!-- ANALYSIS RESULT -->
+
       <section class="result-card hidden" id="resultCard">
 
         <div class="result-header">
@@ -150,10 +441,11 @@
             <h2>Link assessment</h2>
           </div>
 
-          <span class="risk-badge" id="riskBadge">Low Risk</span>
+          <span class="risk-badge" id="riskBadge">
+            Low Risk
+          </span>
 
         </div>
-
 
         <div class="result-content">
 
@@ -168,14 +460,15 @@
 
           </div>
 
-
           <div class="result-details">
 
             <p class="result-label">Analyzed link</p>
 
             <p class="result-url" id="resultUrl"></p>
 
-            <h3 id="resultTitle">No major warning signs found</h3>
+            <h3 id="resultTitle">
+              No major warning signs found
+            </h3>
 
             <p id="resultMessage"></p>
 
@@ -185,7 +478,6 @@
 
         </div>
 
-
         <p class="disclaimer">
           Note: This score is based on predefined rules and does not guarantee that a link is safe.
         </p>
@@ -194,6 +486,7 @@
 
 
       <!-- SCAN OVERVIEW -->
+
       <section class="overview-section">
 
         <div class="section-heading">
@@ -204,7 +497,6 @@
           </div>
 
         </div>
-
 
         <div class="stats-grid">
 
@@ -238,6 +530,7 @@
 
 
       <!-- PREVIOUSLY SCANNED -->
+
       <section class="recent-section">
 
         <div class="section-heading">
@@ -252,7 +545,6 @@
           </button>
 
         </div>
-
 
         <div class="table-card">
 
@@ -270,11 +562,13 @@
               </thead>
 
               <tbody id="recentTableBody">
+
                 <tr>
                   <td colspan="4" class="empty-state">
                     No scans yet. Analyze your first link!
                   </td>
                 </tr>
+
               </tbody>
 
             </table>
@@ -289,14 +583,19 @@
 
 
     <!-- HISTORY PAGE -->
+
     <section class="page" id="historyPage">
 
       <div class="history-heading">
 
         <div>
           <p class="section-kicker">YOUR ACTIVITY</p>
+
           <h1>Scan History</h1>
-          <p>Review your previously analyzed links and their risk levels.</p>
+
+          <p>
+            Review your previously analyzed links and their risk levels.
+          </p>
         </div>
 
         <button class="clear-button" id="clearHistoryButton">
@@ -304,7 +603,6 @@
         </button>
 
       </div>
-
 
       <div class="table-card history-table-card">
 
@@ -322,11 +620,13 @@
             </thead>
 
             <tbody id="historyTableBody">
+
               <tr>
                 <td colspan="4" class="empty-state">
                   No scan history available.
                 </td>
               </tr>
+
             </tbody>
 
           </table>
@@ -334,7 +634,6 @@
         </div>
 
       </div>
-
 
       <button class="back-button" id="backDashboardButton">
         ← Back to Dashboard
@@ -344,17 +643,188 @@
 
 
     <!-- FOOTER -->
+
     <footer class="footer">
+
       <span>PhishGuard</span>
+
       <span>Link awareness. Safer browsing.</span>
+
     </footer>
 
   </main>
 
 
   <!-- TOAST MESSAGE -->
+
   <div class="toast" id="toast"></div>
 
+
+  <!-- JAVASCRIPT -->
+
+  <script>
+(() => {
+  const canvas = document.getElementById("securityCanvas");
+  const screen = document.getElementById("authScreen");
+
+  if (!canvas || !screen) return;
+
+  const ctx = canvas.getContext("2d");
+
+  let width = 0;
+  let height = 0;
+  let particles = [];
+  let animationId;
+  let mouse = { x: -1000, y: -1000 };
+
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+
+  const colors = [
+    "rgba(55, 155, 255,",
+    "rgba(217, 67, 80,",
+    "rgba(120, 190, 255,"
+  ];
+
+  function resizeCanvas() {
+    const rect = screen.getBoundingClientRect();
+
+    width = rect.width;
+    height = rect.height;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    createParticles();
+    drawFrame();
+  }
+
+  function createParticles() {
+    const count = Math.min(
+      100,
+      Math.max(35, Math.floor((width * height) / 11000))
+    );
+
+    particles = [];
+
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.45,
+        vy: (Math.random() - 0.5) * 0.45,
+        radius: Math.random() * 2 + 1,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      });
+    }
+  }
+
+  function drawFrame() {
+    ctx.clearRect(0, 0, width, height);
+
+    particles.forEach((p, i) => {
+      if (!reducedMotion) {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+        const dx = mouse.x - p.x;
+        const dy = mouse.y - p.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 120 && distance > 0) {
+          p.x -= dx / distance * 0.25;
+          p.y -= dy / distance * 0.25;
+        }
+      }
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+
+      ctx.fillStyle = p.color + "0.85)";
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = p.color + "0.8)";
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      for (let j = i + 1; j < particles.length; j++) {
+        const other = particles[j];
+
+        const dx = p.x - other.x;
+        const dy = p.y - other.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 135) {
+          const opacity = (1 - distance / 135) * 0.35;
+
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(other.x, other.y);
+
+          ctx.strokeStyle = `rgba(85, 155, 220, ${opacity})`;
+          ctx.lineWidth = 0.7;
+          ctx.stroke();
+        }
+      }
+    });
+  }
+
+  function animate() {
+    if (!screen.isConnected || screen.offsetParent === null) {
+      animationId = null;
+      return;
+    }
+
+    drawFrame();
+    animationId = requestAnimationFrame(animate);
+  }
+
+  function startAnimation() {
+    if (!animationId && !reducedMotion && !document.hidden) {
+      animationId = requestAnimationFrame(animate);
+    }
+  }
+
+  function stopAnimation() {
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+      animationId = null;
+    }
+  }
+
+  screen.addEventListener("pointermove", (event) => {
+    const rect = screen.getBoundingClientRect();
+
+    mouse.x = event.clientX - rect.left;
+    mouse.y = event.clientY - rect.top;
+  });
+
+  screen.addEventListener("pointerleave", () => {
+    mouse.x = -1000;
+    mouse.y = -1000;
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      stopAnimation();
+    } else {
+      startAnimation();
+    }
+  });
+
+  window.addEventListener("resize", resizeCanvas);
+
+  resizeCanvas();
+  startAnimation();
+})();
+</script>
 
   <script src="script.js"></script>
 
