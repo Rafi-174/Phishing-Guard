@@ -1,4 +1,4 @@
-const API_BASE = "https://YOUR-BACKEND-NAME.onrender.com/api";
+const API_BASE = "https://phishguard-backend-f8gl.onrender.com/api";
 
 const scanForm = document.getElementById("scanForm");
 const urlInput = document.getElementById("urlInput");

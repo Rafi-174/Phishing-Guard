@@ -40,7 +40,7 @@ FRONTEND_ORIGINS = [
     origin.strip().rstrip("/")
     for origin in os.getenv(
         "FRONTEND_ORIGINS",
-        "http://127.0.0.1:5500,http://localhost:5500"
+        "https://spectacular-pasca-84290e.netlify.app,http://127.0.0.1:5500,http://localhost:5500"
     ).split(",")
     if origin.strip()
 ]
