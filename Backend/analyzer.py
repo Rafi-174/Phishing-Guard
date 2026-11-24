@@ -82,7 +82,23 @@ def validate_hostname(hostname):
 
 
 # ==========================================
-# 3. MAIN URL ANALYSIS
+# 3. RISK CLASSIFICATION
+# ==========================================
+
+def classify_risk(score):
+
+    if score <= 30:
+        return "Low Risk"
+
+    elif score <= 60:
+        return "Suspicious"
+
+    else:
+        return "High Risk"
+
+
+# ==========================================
+# 4. MAIN URL ANALYSIS
 # ==========================================
 
 def analyze_url(raw_url):
@@ -148,7 +164,7 @@ def analyze_url(raw_url):
         indicators.append(reason)
 
     # ======================================
-    # 4. IP ADDRESS DETECTION
+    # 5. IP ADDRESS DETECTION
     # ======================================
 
     is_ip_address = False
@@ -164,7 +180,7 @@ def analyze_url(raw_url):
         pass
 
     # ======================================
-    # 5. SUSPICIOUS KEYWORDS
+    # 6. SUSPICIOUS KEYWORDS
     # ======================================
 
     found_words = [
@@ -180,32 +196,35 @@ def analyze_url(raw_url):
         )
 
     # ======================================
-    # 6. DOMAIN LENGTH
+    # 7. DOMAIN LENGTH
     # ======================================
 
     if len(hostname) > 20 and not is_ip_address:
         add_risk(4, "Unusually long domain name")
 
     # ======================================
-    # 7. DOMAIN DOT COUNT
+    # 8. DOMAIN DOT COUNT
     # ======================================
 
     dot_count = hostname.count(".")
+    hostname_parts = hostname.split(".")
 
-    if dot_count >= 2 and not is_ip_address:
+    if (
+        dot_count >= 3
+        and len(hostname_parts) > 3
+        and not is_ip_address
+    ):
         add_risk(3, "Multiple dots in hostname")
 
     # ======================================
-    # 8. SUBDOMAIN ANALYSIS
+    # 9. SUBDOMAIN ANALYSIS
     # ======================================
-
-    hostname_parts = hostname.split(".")
 
     if len(hostname_parts) > 3 and not is_ip_address:
         add_risk(15, "Excessive subdomains detected")
 
     # ======================================
-    # 9. HYPHEN ANALYSIS
+    # 10. HYPHEN ANALYSIS
     # ======================================
 
     hyphen_count = hostname.count("-")
@@ -217,21 +236,21 @@ def analyze_url(raw_url):
         add_risk(5, "Multiple hyphens in hostname")
 
     # ======================================
-    # 10. PUNYCODE
+    # 11. PUNYCODE
     # ======================================
 
     if any(label.startswith("xn--") for label in hostname_parts):
         add_risk(15, "Punycode encoded hostname detected")
 
     # ======================================
-    # 11. URL LENGTH
+    # 12. URL LENGTH
     # ======================================
 
     if len(raw_url) > 120:
         add_risk(10, "Unusually long URL")
 
     # ======================================
-    # 12. SPECIAL CHARACTERS
+    # 13. SPECIAL CHARACTERS
     # ======================================
 
     special_count = len(re.findall(r"[@%!$]", raw_url))
@@ -243,7 +262,7 @@ def analyze_url(raw_url):
         add_risk(5, "At-sign character detected in URL path or query")
 
     # ======================================
-    # 13. URL ENCODING
+    # 14. URL ENCODING
     # ======================================
 
     encoded_count = len(
@@ -254,7 +273,7 @@ def analyze_url(raw_url):
         add_risk(10, "Excessive URL encoding detected")
 
     # ======================================
-    # 14. DOMAIN ENTROPY
+    # 15. DOMAIN ENTROPY
     # ======================================
 
     domain_entropy = calculate_entropy(hostname)
@@ -267,7 +286,7 @@ def analyze_url(raw_url):
         add_risk(10, "Unusually complex hostname pattern")
 
     # ======================================
-    # 15. FULL URL ENTROPY
+    # 16. FULL URL ENTROPY
     # ======================================
 
     url_entropy = calculate_entropy(full_url)
@@ -276,7 +295,7 @@ def analyze_url(raw_url):
         add_risk(5, "High URL character entropy detected")
 
     # ======================================
-    # 16. PATH ANALYSIS
+    # 17. PATH ANALYSIS
     # ======================================
 
     path_parts = [
@@ -287,7 +306,7 @@ def analyze_url(raw_url):
         add_risk(8, "Unusually deep URL path")
 
     # ======================================
-    # 17. QUERY PARAMETERS
+    # 18. QUERY PARAMETERS
     # ======================================
 
     query_count = len([
@@ -298,14 +317,14 @@ def analyze_url(raw_url):
         add_risk(8, "Excessive URL query parameters")
 
     # ======================================
-    # 18. HTTP PROTOCOL
+    # 19. HTTP PROTOCOL
     # ======================================
 
     if scheme == "http":
         add_risk(5, "Connection does not use HTTPS")
 
     # ======================================
-    # 19. UNUSUAL PORT
+    # 20. UNUSUAL PORT
     # ======================================
 
     if port is not None:
@@ -316,7 +335,7 @@ def analyze_url(raw_url):
             add_risk(5, "Non-standard port detected")
 
     # ======================================
-    # 20. ENCODED CONTENT
+    # 21. ENCODED CONTENT
     # ======================================
 
     decoded_url = unquote(raw_url)
@@ -332,7 +351,7 @@ def analyze_url(raw_url):
         add_risk(20, "Potentially suspicious encoded URL content")
 
     # ======================================
-    # 21. NUMERIC DOMAIN ANALYSIS
+    # 22. NUMERIC DOMAIN ANALYSIS
     # ======================================
 
     domain_without_dots = hostname.replace(".", "")
@@ -352,7 +371,7 @@ def analyze_url(raw_url):
         add_risk(8, "Unusually high number of digits in hostname")
 
     # ======================================
-    # 22. RDAP DOMAIN ANALYSIS
+    # 23. RDAP DOMAIN ANALYSIS
     # ======================================
 
     if not is_ip_address:
@@ -394,26 +413,19 @@ def analyze_url(raw_url):
             )
 
     # ======================================
-    # 23. FINAL RISK SCORE
+    # 24. FINAL RISK SCORE
     # ======================================
 
     score = min(score, 100)
 
     # ======================================
-    # 24. RISK CLASSIFICATION
+    # 25. RISK CLASSIFICATION
     # ======================================
 
-    if score <= 30:
-        risk_level = "Low Risk"
-
-    elif score <= 60:
-        risk_level = "Suspicious"
-
-    else:
-        risk_level = "High Risk"
+    risk_level = classify_risk(score)
 
     # ======================================
-    # 25. FINAL RESULT
+    # 26. FINAL RESULT
     # ======================================
 
     return {
