@@ -13,20 +13,10 @@ from rdap_analyzer import analyze_domain
 # ==========================================
 
 SUSPICIOUS_WORDS = [
-    "login",
-    "verify",
-    "update",
-    "account",
-    "password",
-    "signin",
-    "confirm",
-    "secure",
-    "banking",
-    "wallet",
-    "recover",
-    "authentication",
-    "credential",
-    "payment",
+    "login", "verify", "update", "account",
+    "password", "signin", "confirm", "secure",
+    "banking", "wallet", "recover",
+    "authentication", "credential", "payment",
     "verification"
 ]
 
@@ -43,12 +33,10 @@ def calculate_entropy(text):
     counts = Counter(text)
     length = len(text)
 
-    entropy = -sum(
+    return -sum(
         (count / length) * math.log2(count / length)
         for count in counts.values()
     )
-
-    return entropy
 
 
 # ==========================================
@@ -99,8 +87,6 @@ def validate_hostname(hostname):
 
 def analyze_url(raw_url):
 
-    # BASIC VALIDATION
-
     if not isinstance(raw_url, str):
         raise ValueError("URL must be text.")
 
@@ -120,14 +106,10 @@ def analyze_url(raw_url):
         parsed = urlsplit(raw_url)
 
         if parsed.scheme.lower() not in ["http", "https"]:
-            raise ValueError(
-                "Only HTTP and HTTPS URLs are allowed."
-            )
+            raise ValueError("Only HTTP and HTTPS URLs are allowed.")
 
         if not parsed.hostname:
-            raise ValueError(
-                "URL must contain a valid hostname."
-            )
+            raise ValueError("URL must contain a valid hostname.")
 
         original_hostname = parsed.hostname.lower()
 
@@ -136,13 +118,9 @@ def analyze_url(raw_url):
         except ValueError:
             raise ValueError("Invalid port in URL.")
 
-        if (
-            parsed.username is not None
-            or parsed.password is not None
-        ):
+        if parsed.username is not None or parsed.password is not None:
             raise ValueError(
-                "URLs containing embedded credentials "
-                "are not accepted."
+                "URLs containing embedded credentials are not accepted."
             )
 
         hostname = validate_hostname(original_hostname)
@@ -155,10 +133,12 @@ def analyze_url(raw_url):
     score = 0
     indicators = []
 
+    domain_age_days = None
+    days_to_expiry = None
+    rdap_status = "unknown"
+
     full_url = raw_url.lower()
     scheme = parsed.scheme.lower()
-
-    # RISK FUNCTION
 
     def add_risk(points, reason):
 
@@ -178,16 +158,13 @@ def analyze_url(raw_url):
         ipaddress.ip_address(hostname)
         is_ip_address = True
 
-        add_risk(
-            25,
-            "IP address used instead of a domain name"
-        )
+        add_risk(25, "IP address used instead of a domain name")
 
     except ValueError:
         pass
 
     # ======================================
-    # 5. SUSPICIOUS KEYWORD DETECTION
+    # 5. SUSPICIOUS KEYWORDS
     # ======================================
 
     found_words = [
@@ -199,20 +176,15 @@ def analyze_url(raw_url):
 
         add_risk(
             10,
-            "Suspicious keywords detected: "
-            + ", ".join(found_words)
+            "Suspicious keywords detected: " + ", ".join(found_words)
         )
 
     # ======================================
-    # 6. DOMAIN LENGTH ANALYSIS
+    # 6. DOMAIN LENGTH
     # ======================================
 
     if len(hostname) > 20 and not is_ip_address:
-
-        add_risk(
-            4,
-            "Unusually long domain name"
-        )
+        add_risk(4, "Unusually long domain name")
 
     # ======================================
     # 7. DOMAIN DOT COUNT
@@ -221,11 +193,7 @@ def analyze_url(raw_url):
     dot_count = hostname.count(".")
 
     if dot_count >= 2 and not is_ip_address:
-
-        add_risk(
-            3,
-            "Multiple dots in hostname"
-        )
+        add_risk(3, "Multiple dots in hostname")
 
     # ======================================
     # 8. SUBDOMAIN ANALYSIS
@@ -234,11 +202,7 @@ def analyze_url(raw_url):
     hostname_parts = hostname.split(".")
 
     if len(hostname_parts) > 3 and not is_ip_address:
-
-        add_risk(
-            15,
-            "Excessive subdomains detected"
-        )
+        add_risk(15, "Excessive subdomains detected")
 
     # ======================================
     # 9. HYPHEN ANALYSIS
@@ -247,86 +211,50 @@ def analyze_url(raw_url):
     hyphen_count = hostname.count("-")
 
     if hyphen_count >= 1 and not is_ip_address:
-
-        add_risk(
-            3,
-            "Hyphen detected in hostname"
-        )
+        add_risk(3, "Hyphen detected in hostname")
 
     if hyphen_count >= 2 and not is_ip_address:
-
-        add_risk(
-            5,
-            "Multiple hyphens in hostname"
-        )
+        add_risk(5, "Multiple hyphens in hostname")
 
     # ======================================
-    # 10. PUNYCODE DETECTION
+    # 10. PUNYCODE
     # ======================================
 
-    if any(
-        label.startswith("xn--")
-        for label in hostname_parts
-    ):
-
-        add_risk(
-            15,
-            "Punycode encoded hostname detected"
-        )
+    if any(label.startswith("xn--") for label in hostname_parts):
+        add_risk(15, "Punycode encoded hostname detected")
 
     # ======================================
-    # 11. URL LENGTH ANALYSIS
+    # 11. URL LENGTH
     # ======================================
 
     if len(raw_url) > 120:
-
-        add_risk(
-            10,
-            "Unusually long URL"
-        )
+        add_risk(10, "Unusually long URL")
 
     # ======================================
-    # 12. SPECIAL CHARACTER ANALYSIS
+    # 12. SPECIAL CHARACTERS
     # ======================================
 
-    special_count = len(
-        re.findall(r"[@%!$]", raw_url)
-    )
+    special_count = len(re.findall(r"[@%!$]", raw_url))
 
     if special_count >= 2:
-
-        add_risk(
-            10,
-            "Multiple unusual special characters detected"
-        )
+        add_risk(10, "Multiple unusual special characters detected")
 
     if "@" in parsed.path or "@" in parsed.query:
-
-        add_risk(
-            5,
-            "At-sign character detected in URL path or query"
-        )
+        add_risk(5, "At-sign character detected in URL path or query")
 
     # ======================================
-    # 13. URL ENCODING ANALYSIS
+    # 13. URL ENCODING
     # ======================================
 
     encoded_count = len(
-        re.findall(
-            r"%[0-9a-fA-F]{2}",
-            raw_url
-        )
+        re.findall(r"%[0-9a-fA-F]{2}", raw_url)
     )
 
     if encoded_count >= 4:
-
-        add_risk(
-            10,
-            "Excessive URL encoding detected"
-        )
+        add_risk(10, "Excessive URL encoding detected")
 
     # ======================================
-    # 14. DOMAIN ENTROPY ANALYSIS
+    # 14. DOMAIN ENTROPY
     # ======================================
 
     domain_entropy = calculate_entropy(hostname)
@@ -336,11 +264,7 @@ def analyze_url(raw_url):
         and domain_entropy > 3.8
         and not is_ip_address
     ):
-
-        add_risk(
-            10,
-            "Unusually complex hostname pattern"
-        )
+        add_risk(10, "Unusually complex hostname pattern")
 
     # ======================================
     # 15. FULL URL ENTROPY
@@ -349,76 +273,50 @@ def analyze_url(raw_url):
     url_entropy = calculate_entropy(full_url)
 
     if url_entropy > 4.0:
-
-        add_risk(
-            5,
-            "High URL character entropy detected"
-        )
+        add_risk(5, "High URL character entropy detected")
 
     # ======================================
-    # 16. URL PATH ANALYSIS
+    # 16. PATH ANALYSIS
     # ======================================
 
     path_parts = [
-        part
-        for part in parsed.path.split("/")
-        if part
+        part for part in parsed.path.split("/") if part
     ]
 
     if len(path_parts) >= 6:
-
-        add_risk(
-            8,
-            "Unusually deep URL path"
-        )
+        add_risk(8, "Unusually deep URL path")
 
     # ======================================
-    # 17. QUERY PARAMETER ANALYSIS
+    # 17. QUERY PARAMETERS
     # ======================================
 
     query_count = len([
-        item
-        for item in parsed.query.split("&")
-        if item
+        item for item in parsed.query.split("&") if item
     ])
 
     if query_count >= 8:
-
-        add_risk(
-            8,
-            "Excessive URL query parameters"
-        )
+        add_risk(8, "Excessive URL query parameters")
 
     # ======================================
-    # 18. HTTP PROTOCOL ANALYSIS
+    # 18. HTTP PROTOCOL
     # ======================================
 
     if scheme == "http":
-
-        add_risk(
-            5,
-            "Connection does not use HTTPS"
-        )
+        add_risk(5, "Connection does not use HTTPS")
 
     # ======================================
-    # 19. UNUSUAL PORT DETECTION
+    # 19. UNUSUAL PORT
     # ======================================
 
     if port is not None:
 
-        default_port = (
-            80 if scheme == "http" else 443
-        )
+        default_port = 80 if scheme == "http" else 443
 
         if port != default_port:
-
-            add_risk(
-                5,
-                "Non-standard port detected"
-            )
+            add_risk(5, "Non-standard port detected")
 
     # ======================================
-    # 20. ENCODED CONTENT ANALYSIS
+    # 20. ENCODED CONTENT
     # ======================================
 
     decoded_url = unquote(raw_url)
@@ -431,11 +329,7 @@ def analyze_url(raw_url):
             re.IGNORECASE
         )
     ):
-
-        add_risk(
-            20,
-            "Potentially suspicious encoded URL content"
-        )
+        add_risk(20, "Potentially suspicious encoded URL content")
 
     # ======================================
     # 21. NUMERIC DOMAIN ANALYSIS
@@ -444,27 +338,18 @@ def analyze_url(raw_url):
     domain_without_dots = hostname.replace(".", "")
 
     digit_count = sum(
-        char.isdigit()
-        for char in domain_without_dots
+        char.isdigit() for char in domain_without_dots
     )
 
     if digit_count >= 1 and not is_ip_address:
-
-        add_risk(
-            2,
-            "Digits detected in hostname"
-        )
+        add_risk(2, "Digits detected in hostname")
 
     if (
         len(domain_without_dots) >= 10
         and digit_count / len(domain_without_dots) > 0.5
         and not is_ip_address
     ):
-
-        add_risk(
-            8,
-            "Unusually high number of digits in hostname"
-        )
+        add_risk(8, "Unusually high number of digits in hostname")
 
     # ======================================
     # 22. RDAP DOMAIN ANALYSIS
@@ -476,28 +361,33 @@ def analyze_url(raw_url):
 
             rdap_result = analyze_domain(hostname)
 
-            # Add RDAP indicators
+            rdap_status = rdap_result.get(
+                "rdap_status", "unknown"
+            )
+
+            domain_age_days = rdap_result.get(
+                "domain_age_days"
+            )
+
+            days_to_expiry = rdap_result.get(
+                "days_to_expiry"
+            )
+
             for reason in rdap_result.get("indicators", []):
 
-                indicators.append(
-                    "RDAP: " + reason
-                )
+                indicators.append("RDAP: " + reason)
 
-            # Only score successful RDAP lookups.
-            # Network errors/timeouts are not phishing evidence.
-
-            if rdap_result.get("rdap_status") == "success":
+            if rdap_status == "success":
 
                 rdap_score = rdap_result.get(
                     "rdap_risk_score", 0
                 )
 
-                score += max(
-                    0,
-                    int(rdap_score)
-                )
+                score += max(0, int(rdap_score))
 
         except Exception:
+
+            rdap_status = "unknown"
 
             indicators.append(
                 "RDAP: Domain registration check unavailable"
@@ -514,15 +404,12 @@ def analyze_url(raw_url):
     # ======================================
 
     if score <= 30:
-
         risk_level = "Low Risk"
 
     elif score <= 60:
-
         risk_level = "Suspicious"
 
     else:
-
         risk_level = "High Risk"
 
     # ======================================
@@ -530,15 +417,13 @@ def analyze_url(raw_url):
     # ======================================
 
     return {
-
         "url": raw_url,
-
         "risk_score": score,
-
         "risk_level": risk_level,
-
-        "indicators": indicators
-
+        "indicators": indicators,
+        "domain_age_days": domain_age_days,
+        "days_to_expiry": days_to_expiry,
+        "rdap_status": rdap_status
     }
 
 

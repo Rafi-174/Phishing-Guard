@@ -12,7 +12,15 @@ def get_connection():
 
 # SAVE URL SCAN
 
-def save_scan(url, risk_score, risk_level, indicators):
+def save_scan(
+    url,
+    risk_score,
+    risk_level,
+    indicators,
+    domain_age_days=None,
+    days_to_expiry=None,
+    rdap_status="unknown"
+):
 
     connection = get_connection()
     cursor = None
@@ -22,15 +30,26 @@ def save_scan(url, risk_score, risk_level, indicators):
 
         sql = """
             INSERT INTO scans
-            (url, risk_score, risk_level, indicators)
-            VALUES (%s, %s, %s, %s)
+            (
+                url,
+                risk_score,
+                risk_level,
+                indicators,
+                domain_age_days,
+                days_to_expiry,
+                rdap_status
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
 
         values = (
             url,
             risk_score,
             risk_level,
-            json.dumps(indicators)
+            json.dumps(indicators),
+            domain_age_days,
+            days_to_expiry,
+            rdap_status
         )
 
         cursor.execute(sql, values)
@@ -62,6 +81,9 @@ def get_all_scans(limit=100):
                 risk_score,
                 risk_level,
                 indicators,
+                domain_age_days,
+                days_to_expiry,
+                rdap_status,
                 scanned_at
             FROM scans
             ORDER BY scanned_at DESC, id DESC

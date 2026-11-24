@@ -138,6 +138,105 @@ function getRiskClass(level) {
 }
 
 
+// RDAP DISPLAY HELPERS
+
+function formatDomainAge(days) {
+
+  if (days === null || days === undefined || days === "") {
+    return "Not Available";
+  }
+
+  const years = Math.floor(Number(days) / 365);
+  const remainingDays = Number(days) % 365;
+
+  if (!Number.isFinite(Number(days))) {
+    return "Not Available";
+  }
+
+  if (years > 0) {
+    return `${years} years, ${remainingDays} days`;
+  }
+
+  return `${days} days`;
+}
+
+
+function formatExpiry(days) {
+
+  if (days === null || days === undefined || days === "") {
+    return "Not Available";
+  }
+
+  if (!Number.isFinite(Number(days))) {
+    return "Not Available";
+  }
+
+  return `${days} days`;
+}
+
+
+function formatRdapStatus(status) {
+
+  if (!status) {
+    return "Not Available";
+  }
+
+  return status.replaceAll("_", " ").toUpperCase();
+
+}
+
+
+// DISPLAY RDAP INFORMATION
+
+function displayRdapInfo(result) {
+
+  let rdapBox = document.getElementById("rdapInfo");
+
+  if (!rdapBox) {
+
+    rdapBox = document.createElement("div");
+
+    rdapBox.id = "rdapInfo";
+    rdapBox.className = "rdap-info";
+
+    const indicatorList = document.getElementById("indicatorList");
+
+    if (indicatorList) {
+      indicatorList.insertAdjacentElement("afterend", rdapBox);
+    } else {
+      resultCard.appendChild(rdapBox);
+    }
+
+  }
+
+  rdapBox.innerHTML = `
+
+    <h3>Domain Registration Information</h3>
+
+    <div class="rdap-grid">
+
+      <div class="rdap-item">
+        <span>Domain Age</span>
+        <strong>${escapeHTML(formatDomainAge(result.domain_age_days))}</strong>
+      </div>
+
+      <div class="rdap-item">
+        <span>Days to Expiry</span>
+        <strong>${escapeHTML(formatExpiry(result.days_to_expiry))}</strong>
+      </div>
+
+      <div class="rdap-item">
+        <span>RDAP Status</span>
+        <strong>${escapeHTML(formatRdapStatus(result.rdap_status))}</strong>
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
 // DISPLAY RESULT
 
 function displayResult(result) {
@@ -147,12 +246,10 @@ function displayResult(result) {
   const badge = document.getElementById("riskBadge");
   const circle = document.getElementById("scoreCircle");
 
-
   badge.textContent = result.risk_level;
   badge.className = "risk-badge";
 
   circle.className = "score-circle";
-
 
   if (result.risk_level === "High Risk") {
 
@@ -166,17 +263,14 @@ function displayResult(result) {
 
   }
 
-
   document.getElementById("riskScore").textContent =
     result.risk_score;
 
   document.getElementById("resultUrl").textContent =
     result.url;
 
-
   let title = "";
   let message = "";
-
 
   if (result.risk_level === "Low Risk") {
 
@@ -201,14 +295,10 @@ function displayResult(result) {
 
   }
 
-
   document.getElementById("resultTitle").textContent = title;
-
   document.getElementById("resultMessage").textContent = message;
 
-
   const indicatorList = document.getElementById("indicatorList");
-
 
   if (!result.indicators || result.indicators.length === 0) {
 
@@ -228,6 +318,9 @@ function displayResult(result) {
 
   }
 
+  // SHOW RDAP INFORMATION
+
+  displayRdapInfo(result);
 
   resultCard.scrollIntoView({
     behavior: "smooth",
@@ -267,7 +360,6 @@ scanForm.addEventListener("submit", async event => {
 
     });
 
-
     displayResult(data.result);
 
     await updateDashboard();
@@ -303,6 +395,34 @@ document.querySelectorAll(".demo-link").forEach(button => {
 });
 
 
+// UPDATE TABLE HEADERS
+
+function updateTableHeaders(bodyId) {
+
+  const body = document.getElementById(bodyId);
+  const table = body?.closest("table");
+
+  if (!table) return;
+
+  const thead = table.querySelector("thead");
+
+  if (!thead) return;
+
+  thead.innerHTML = `
+    <tr>
+      <th>URL</th>
+      <th>Risk Level</th>
+      <th>Score</th>
+      <th>Domain Age</th>
+      <th>Days to Expiry</th>
+      <th>RDAP Status</th>
+      <th>Scanned At</th>
+    </tr>
+  `;
+
+}
+
+
 // CREATE TABLE ROW
 
 function createTableRow(scan) {
@@ -320,7 +440,13 @@ function createTableRow(scan) {
         </span>
       </td>
 
-      <td>${scan.risk_score}/100</td>
+      <td>${escapeHTML(scan.risk_score)}/100</td>
+
+      <td>${escapeHTML(formatDomainAge(scan.domain_age_days))}</td>
+
+      <td>${escapeHTML(formatExpiry(scan.days_to_expiry))}</td>
+
+      <td>${escapeHTML(formatRdapStatus(scan.rdap_status))}</td>
 
       <td>${escapeHTML(scan.scanned_at || "")}</td>
 
@@ -352,18 +478,19 @@ async function updateDashboard() {
     document.getElementById("lowRisk").textContent =
       stats.low_risk;
 
-
     // LOAD RECENT SCANS
 
     const historyData = await apiRequest("/scans?limit=5");
 
     const recentBody = document.getElementById("recentTableBody");
 
+    updateTableHeaders("recentTableBody");
+
     if (historyData.scans.length === 0) {
 
       recentBody.innerHTML = `
         <tr>
-          <td colspan="4" class="empty-state">
+          <td colspan="7" class="empty-state">
             No scans yet. Analyze your first link!
           </td>
         </tr>
@@ -392,9 +519,11 @@ async function renderHistory() {
 
   const historyBody = document.getElementById("historyTableBody");
 
+  updateTableHeaders("historyTableBody");
+
   historyBody.innerHTML = `
     <tr>
-      <td colspan="4" class="empty-state">
+      <td colspan="7" class="empty-state">
         Loading scan history...
       </td>
     </tr>
@@ -408,7 +537,7 @@ async function renderHistory() {
 
       historyBody.innerHTML = `
         <tr>
-          <td colspan="4" class="empty-state">
+          <td colspan="7" class="empty-state">
             No scan history available.
           </td>
         </tr>
@@ -426,7 +555,7 @@ async function renderHistory() {
 
     historyBody.innerHTML = `
       <tr>
-        <td colspan="4" class="empty-state">
+        <td colspan="7" class="empty-state">
           Could not load scan history.
         </td>
       </tr>

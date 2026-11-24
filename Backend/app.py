@@ -66,11 +66,14 @@ def scan_url():
 
         # Save result in MySQL.
         scan_id = save_scan(
-            result["url"],
-            result["risk_score"],
-            result["risk_level"],
-            result["indicators"]
-        )
+    result["url"],
+    result["risk_score"],
+    result["risk_level"],
+    result["indicators"],
+    result.get("domain_age_days"),
+    result.get("days_to_expiry"),
+    result.get("rdap_status", "unknown")
+)
 
         return jsonify({
             "status": "success",

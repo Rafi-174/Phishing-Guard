@@ -1003,3 +1003,46 @@ td:first-child {
   }
 
 }
+/* RDAP INFORMATION */
+
+.rdap-info {
+  margin-top: 22px;
+  padding: 18px;
+  border: 1px solid rgba(128, 128, 128, 0.25);
+  border-radius: 12px;
+}
+
+.rdap-info h3 {
+  margin-bottom: 15px;
+}
+
+.rdap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.rdap-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 9px;
+  background: rgba(128, 128, 128, 0.08);
+  overflow-wrap: anywhere;
+}
+
+.rdap-item span {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.rdap-item strong {
+  font-size: 15px;
+}
+
+@media (max-width: 600px) {
+  .rdap-grid {
+    grid-template-columns: 1fr;
+  }
+}
