@@ -25,7 +25,8 @@ DB_CONFIG = {
     "connection_timeout": 15
 }
 
-# Enable certificate verification for cloud database
+# CLOUD DATABASE SSL
+
 if DB_HOST != "localhost" and DB_HOST != "127.0.0.1":
     DB_CONFIG.update({
         "ssl_ca": str(BASE_DIR / "ca.pem"),
@@ -51,3 +52,13 @@ FRONTEND_ORIGINS = [
 FLASK_DEBUG = (
     os.getenv("FLASK_DEBUG", "false").lower() == "true"
 )
+
+
+# AUTHENTICATION SECRET KEY
+
+AUTH_SECRET_KEY = os.getenv("AUTH_SECRET_KEY")
+
+if not AUTH_SECRET_KEY:
+    raise RuntimeError(
+        "AUTH_SECRET_KEY is missing from environment variables"
+    )
