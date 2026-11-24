@@ -52,7 +52,7 @@ function showAuth(mode = "login") {
     });
 
     const titles = {
-        login: "Welcome Back",
+        login: "Welcome User",
         register: "Create Account",
         forgot: "Forgot Password?",
         verify: "Verify Your Email",
