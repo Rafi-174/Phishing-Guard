@@ -295,7 +295,24 @@ def analyze_url(raw_url):
         add_risk(5, "High URL character entropy detected")
 
     # ======================================
-    # 17. PATH ANALYSIS
+    # 17. PATH TRAVERSAL DETECTION
+    # ======================================
+
+    decoded_path = parsed.path
+
+    # Decode repeatedly to detect encoded traversal patterns
+    for _ in range(3):
+        decoded_path = unquote(decoded_path)
+
+    normalized_path = decoded_path.replace("\\", "/")
+
+    path_segments = normalized_path.split("/")
+
+    if any(segment == ".." for segment in path_segments):
+        add_risk(15, "Path traversal pattern detected")
+
+    # ======================================
+    # 18. PATH ANALYSIS
     # ======================================
 
     path_parts = [
@@ -306,7 +323,7 @@ def analyze_url(raw_url):
         add_risk(8, "Unusually deep URL path")
 
     # ======================================
-    # 18. QUERY PARAMETERS
+    # 19. QUERY PARAMETERS
     # ======================================
 
     query_count = len([
@@ -317,14 +334,14 @@ def analyze_url(raw_url):
         add_risk(8, "Excessive URL query parameters")
 
     # ======================================
-    # 19. HTTP PROTOCOL
+    # 20. HTTP PROTOCOL
     # ======================================
 
     if scheme == "http":
         add_risk(5, "Connection does not use HTTPS")
 
     # ======================================
-    # 20. UNUSUAL PORT
+    # 21. UNUSUAL PORT
     # ======================================
 
     if port is not None:
@@ -335,7 +352,7 @@ def analyze_url(raw_url):
             add_risk(5, "Non-standard port detected")
 
     # ======================================
-    # 21. ENCODED CONTENT
+    # 22. ENCODED CONTENT
     # ======================================
 
     decoded_url = unquote(raw_url)
@@ -351,7 +368,7 @@ def analyze_url(raw_url):
         add_risk(20, "Potentially suspicious encoded URL content")
 
     # ======================================
-    # 22. NUMERIC DOMAIN ANALYSIS
+    # 23. NUMERIC DOMAIN ANALYSIS
     # ======================================
 
     domain_without_dots = hostname.replace(".", "")
@@ -371,7 +388,7 @@ def analyze_url(raw_url):
         add_risk(8, "Unusually high number of digits in hostname")
 
     # ======================================
-    # 23. RDAP DOMAIN ANALYSIS
+    # 24. RDAP DOMAIN ANALYSIS
     # ======================================
 
     if not is_ip_address:
@@ -413,19 +430,19 @@ def analyze_url(raw_url):
             )
 
     # ======================================
-    # 24. FINAL RISK SCORE
+    # 25. FINAL RISK SCORE
     # ======================================
 
     score = min(score, 100)
 
     # ======================================
-    # 25. RISK CLASSIFICATION
+    # 26. RISK CLASSIFICATION
     # ======================================
 
     risk_level = classify_risk(score)
 
     # ======================================
-    # 26. FINAL RESULT
+    # 27. FINAL RESULT
     # ======================================
 
     return {
